@@ -9,7 +9,7 @@ import Album from '../components/Album';
 import Sidebar from '../components/Sidebar';
 import Player from '../components/Player';
 
-import { convertAlbum, convertAlbums, skip, convertSongs } from '../utils';
+import { convertAlbum, convertAlbums, skip, convertSongs, convertSong } from '../utils';
 
 export default class AppContainer extends Component {
 
@@ -24,6 +24,7 @@ export default class AppContainer extends Component {
     this.selectAlbum = this.selectAlbum.bind(this);
     this.selectArtist = this.selectArtist.bind(this);
     this.postNewPlaylist = this.postNewPlaylist.bind(this);
+    this.getPlaylist = this.getPlaylist.bind(this);
   }
 
   componentDidMount () {
@@ -47,17 +48,27 @@ export default class AppContainer extends Component {
     AUDIO.addEventListener('timeupdate', () =>
       this.setProgress(AUDIO.currentTime / AUDIO.duration));
   }
-  
+
   postNewPlaylist (npv) {
       // post new playlist
       axios
           .post('/api/playlists', {name: npv})
-          .then(response => 
+          .then(response =>
               this.setState({
                   playlists : [...this.state.playlists, response.data]
               })
           )
           .catch(console.error.bind(console));
+  }
+
+  getPlaylist (playlistId) {
+    axios.get(`/api/playlists/${playlistId}`)
+    .then(res => {
+      res.data.songs = res.data.songs.map(convertSong)
+      this.setState({ selectedPlaylist: res.data })
+      // console.log("res.data in getPlaylist", res.data)
+    })
+    .catch(console.error.bind(console));
   }
 
   onLoad (albums, artists, playlists) {
@@ -139,8 +150,8 @@ export default class AppContainer extends Component {
     return (
       <div id="main" className="container-fluid">
         <div className="col-xs-2">
-          <Sidebar 
-            deselectAlbum={this.deselectAlbum} 
+          <Sidebar
+            deselectAlbum={this.deselectAlbum}
             playlists={this.state.playlists}
           />
         </div>
@@ -163,9 +174,13 @@ export default class AppContainer extends Component {
                 // ARTIST (singular) PROPS
                 selectArtist: this.selectArtist,
                 selectedArtist: this.state.selectedArtist,
-                
+
                 // NewPlaylistContainer
-                postNewPlaylist: this.postNewPlaylist
+                postNewPlaylist: this.postNewPlaylist,
+
+                //Playlist PROPS
+                getPlaylist: this.getPlaylist,
+                selectedPlaylist: this.state.selectedPlaylist,
 
             })
         }

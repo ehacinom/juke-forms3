@@ -11,6 +11,7 @@ import Artist from './components/Artist';
 import Songs from './components/Songs';
 // import NewPlaylist from './components/NewPlaylist';
 import NewPlaylistContainer from './containers/NewPlaylistContainer';
+import Playlist from './components/Playlist';
 
 const router = (
     <Router history={hashHistory}>
@@ -25,7 +26,8 @@ const router = (
                 <Route path="songs" component={Songs} />
             </Route>
 
-            <Route path="newPlaylist" component={NewPlaylistContainer} />
+            <Route path="/playlists" component={NewPlaylistContainer} />
+            <Route path="/playlists/:playlistId" component={Playlist} />
         </Route>
     </Router>
 );

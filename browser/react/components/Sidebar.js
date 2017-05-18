@@ -20,17 +20,17 @@ const Sidebar = ({ playlists }) => {
                 <h4 className="text-muted">PLAYLISTS</h4>
                 <ul className="list-unstyled">
                     {playlists.map(item => (
-                      <li 
-                        className="playlist-item menu-item" 
+                      <li
+                        className="playlist-item menu-item"
                         key={item.id}
                       >
-                        <Link to="FILL_ME_IN">{item.name}</Link>
+                        <Link to={`/playlists/${item.id}`}>{item.name}</Link>
                       </li>
                     ))}
                 </ul>
-        
+
                 <h4>
-                    <Link className="btn btn-primary btn-block" to="/newPlaylist">
+                    <Link className="btn btn-primary btn-block" to="/playlists">
                     <span className="glyphicon glyphicon-plus"></span> PLAYLIST
                     </Link>
                 </h4>
