@@ -13797,6 +13797,13 @@ var Playlist = function (_React$Component) {
       this.props.getPlaylist(this.props.routeParams.playlistId);
     }
   }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.props.routeParams.playlistId !== nextProps.routeParams.playlistId) {
+        this.props.getPlaylist(nextProps.routeParams.playlistId);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var selectedPL = this.props.selectedPlaylist;
@@ -14215,6 +14222,8 @@ var _react = __webpack_require__(5);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRouter = __webpack_require__(32);
+
 var _NewPlaylist = __webpack_require__(151);
 
 var _NewPlaylist2 = _interopRequireDefault(_NewPlaylist);
@@ -14268,6 +14277,8 @@ var NewPlaylistContainer = function (_React$Component) {
         value: function onNewPlaylistSubmit(e) {
             this.props.postNewPlaylist(this.state.newPlaylistValue);
             e.preventDefault();
+            // const path = `/playlists/${playistId}`
+            // browserHistory.push(path)
             this.setState({
                 newPlaylistValue: '',
                 dirty: false

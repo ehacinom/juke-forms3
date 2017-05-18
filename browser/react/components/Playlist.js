@@ -10,6 +10,12 @@ class Playlist extends React.Component {
     this.props.getPlaylist(this.props.routeParams.playlistId)
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (this.props.routeParams.playlistId !== nextProps.routeParams.playlistId ) {
+      this.props.getPlaylist(nextProps.routeParams.playlistId)
+    }
+  }
+
   render () {
     const selectedPL = this.props.selectedPlaylist
     console.log("selectedPL in Playlist.js", selectedPL)
