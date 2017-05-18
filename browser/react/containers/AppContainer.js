@@ -23,15 +23,23 @@ export default class AppContainer extends Component {
     this.prev = this.prev.bind(this);
     this.selectAlbum = this.selectAlbum.bind(this);
     this.selectArtist = this.selectArtist.bind(this);
+    this.postNewPlaylist = this.postNewPlaylist.bind(this);
   }
 
   componentDidMount () {
-    const fetchAlbums = axios.get('/api/albums/').then(res => res.data);
-    const fetchArtists = axios.get('/api/artists').then(res => res.data);
+    const fetchAlbums = axios
+      .get('/api/albums/')
+      .then(res => res.data);
+    const fetchArtists = axios
+      .get('/api/artists')
+      .then(res => res.data);
+    const fetchPlaylists = axios
+      .get('/api/playlists')
+      .then(res => res.data);
 
-    Promise.all([fetchAlbums, fetchArtists])
-      .then(([albums, artists]) => {
-        this.onLoad(convertAlbums(albums), artists);
+    Promise.all([fetchAlbums, fetchArtists, fetchPlaylists])
+      .then(([albums, artists, playlists]) => {
+        this.onLoad(convertAlbums(albums), artists, playlists);
       });
 
     AUDIO.addEventListener('ended', () =>
@@ -39,11 +47,24 @@ export default class AppContainer extends Component {
     AUDIO.addEventListener('timeupdate', () =>
       this.setProgress(AUDIO.currentTime / AUDIO.duration));
   }
+  
+  postNewPlaylist (npv) {
+      // post new playlist
+      axios
+          .post('/api/playlists', {name: npv})
+          .then(response => 
+              this.setState({
+                  playlists : [...this.state.playlists, response.data]
+              })
+          )
+          .catch(console.error.bind(console));
+  }
 
-  onLoad (albums, artists) {
+  onLoad (albums, artists, playlists) {
     this.setState({
       albums: albums,
       artists: artists,
+      playlists: playlists,
     });
   }
 
@@ -114,33 +135,39 @@ export default class AppContainer extends Component {
       });
   }
 
-
   render () {
     return (
       <div id="main" className="container-fluid">
         <div className="col-xs-2">
-          <Sidebar deselectAlbum={this.deselectAlbum} />
+          <Sidebar 
+            deselectAlbum={this.deselectAlbum} 
+            playlists={this.state.playlists}
+          />
         </div>
         <div className="col-xs-10">
         {
-          this.props.children && React.cloneElement(this.props.children, {
-            // ALBUMS PROPS
-            albums: this.state.albums,
+            this.props.children && React.cloneElement(this.props.children, {
+                // ALBUMS PROPS
+                albums: this.state.albums,
 
-            // ALBUM (singular) PROPS
-            selectAlbum: this.selectAlbum,
-            album: this.state.selectedAlbum,
-            currentSong: this.state.currentSong,
-            isPlaying: this.state.isPlaying,
-            toggleOne: this.toggleOne,
+                // ALBUM (singular) PROPS
+                selectAlbum: this.selectAlbum,
+                album: this.state.selectedAlbum,
+                currentSong: this.state.currentSong,
+                isPlaying: this.state.isPlaying,
+                toggleOne: this.toggleOne,
 
-            // ARTISTS PROPS
-            artists: this.state.artists,
+                // ARTISTS PROPS
+                artists: this.state.artists,
 
-            // ARTIST (singular) PROPS
-            selectArtist: this.selectArtist,
-            selectedArtist: this.state.selectedArtist,
-          })
+                // ARTIST (singular) PROPS
+                selectArtist: this.selectArtist,
+                selectedArtist: this.state.selectedArtist,
+                
+                // NewPlaylistContainer
+                postNewPlaylist: this.postNewPlaylist
+
+            })
         }
         </div>
         <Player
